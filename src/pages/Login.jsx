@@ -1,10 +1,21 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { ShopContext } from '../context/ShopContext';
 
 const Login = () => {
   const [currentState, setCurrentState] = useState('Sign Up');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { login } = useContext(ShopContext);
 
   const onSubmmitHandler = (e) => {
     e.preventDefault();
+    // Attempt login via context (dev-only accepts any credentials)
+    if (currentState === 'Login') {
+      login({ email, password });
+    } else {
+      // For Sign Up we mimic account creation by logging in as well
+      login({ email, password });
+    }
   };
 
   return (
@@ -29,12 +40,16 @@ const Login = () => {
 
         <input
           type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-Full px-3 py-2 border border-gray-880"
           placeholder="Email"
           required
         />
         <input
           type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           className="w-Full px-3 py-2 border border-gray-880"
           placeholder="Password"
           required

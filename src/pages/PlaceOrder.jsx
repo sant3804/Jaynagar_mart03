@@ -2,12 +2,36 @@ import { useContext, useState } from 'react';
 import { assets } from '../assets/assets';
 import CartTotal from '../Components/CartTotal';
 import Title from '../Components/Title';
-import { ShopContext } from '../Context/ShopContext';
+import { ShopContext } from '../context/ShopContext';
+import { toast } from 'react-toastify';
 
 const PlaceOrder = () => {
   const [paymentMethod, setPaymentMethod] = useState('cod');
 
-  const { navigate } = useContext(ShopContext);
+  const { navigate, addOrder, cartItems } = useContext(ShopContext);
+
+  const handlePlaceOrder = () => {
+    // Check if cart has items
+    const hasItems = Object.keys(cartItems).some(itemId => 
+      Object.values(cartItems[itemId]).some(qty => qty > 0)
+    );
+
+    if (!hasItems) {
+      toast.error('Your cart is empty!');
+      return;
+    }
+
+    // Add order to context
+    addOrder();
+    
+    // Show success message
+    toast.success('Order placed successfully! 🎉');
+    
+    // Navigate to orders page
+    setTimeout(() => {
+      navigate('/orders');
+    }, 1000);
+  };
 
   return (
     <div className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t">
@@ -131,8 +155,8 @@ const PlaceOrder = () => {
 
           <div className="w-full text-end mt-8">
             <button
-              onClick={() => navigate('/orders')}
-              className="bg-black text-white px-16 py-3 text-sm"
+              onClick={handlePlaceOrder}
+              className="bg-black text-white px-16 py-3 text-sm hover:bg-gray-800 transition-colors"
             >
               PLACE ORDER
             </button>

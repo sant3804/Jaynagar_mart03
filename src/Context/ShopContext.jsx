@@ -14,6 +14,34 @@ const ShopContextProvider = ({ children }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [orders, setOrders] = useState([]); // New state to hold orders
+  const [darkMode, setDarkMode] = useState(false);
+  // Simple auth state for development/testing
+  const [user, setUser] = useState(null);
+  const allowAnyLogin = import.meta.env.MODE === 'development' || import.meta.env.VITE_ALLOW_ANY_LOGIN === 'true';
+
+  const login = ({ email, password } = {}) => {
+    // In development we allow any credentials for testing purposes
+    if (allowAnyLogin) {
+      const fakeUser = {
+        email: email || 'test@example.com',
+        name: email ? email.split('@')[0] : 'Tester',
+      };
+      setUser(fakeUser);
+      toast.success('Logged in (dev mode)');
+      navigate('/');
+      return true;
+    }
+
+    // Production: no auth implemented — reject
+    toast.error('Login disabled in production');
+    return false;
+  };
+
+  const logout = () => {
+    setUser(null);
+    toast.info('Logged out');
+    navigate('/');
+  };
   const navigate = useNavigate(); // to navigate to different pages
 
   const addToCart = async (itemId, size) => {
@@ -90,6 +118,10 @@ const ShopContextProvider = ({ children }) => {
     return totalAmount;
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   const value = {
     products,
     currency,
@@ -106,6 +138,11 @@ const ShopContextProvider = ({ children }) => {
     addOrder, // Add this to allow placing orders
     orders,
     navigate,
+    darkMode,
+    toggleDarkMode,
+    user,
+    login,
+    logout,
   };
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
